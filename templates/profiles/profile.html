@@ -1,0 +1,11 @@
+{# templates/profiles/profile.html #}
+{% extends "base.html" %}
+
+{% block title %}Profil uživatele {{ user.username }}{% endblock %}
+
+{% block content %}
+  <h1>Toto je profil uživatele {{ user.username }}</h1>
+  <p>Email: {{ user.email }}</p>
+  <p>Role: {{ user.profile.role }}</p>
+  {# Další informace o profilu #}
+{% endblock %}

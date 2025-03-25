@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrace uživatele</title>
+</head>
+<body>
+    <h2>Registrace uživatele</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrovat se</button>
+    </form>
+
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p>Máte již účet? <a href="{% url 'login' %}">Přihlaste se zde.</a></p>
+</body>
+</html>

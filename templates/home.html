@@ -1,0 +1,24 @@
+{# templates/home.html #}
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Vítejte v Redakčním Systému</h1>
+
+  {% if not user.is_authenticated %}
+    <h2>Přihlášení</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Přihlásit se</button>
+    </form>
+  {% endif %}
+
+  <h2>Nejnovější reporty</h2>
+  <ul>
+    {% for report in latest_reports %}
+      <li><a href="{% url 'reports:report_detail' report.id %}">{{ report.title }}</a></li>
+    {% empty %}
+      <li>Žádné reporty nebyly nalezeny.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

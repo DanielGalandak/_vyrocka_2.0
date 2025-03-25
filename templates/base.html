@@ -1,0 +1,68 @@
+{# templates/base.html #}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}Redakční Systém{% endblock %}</title>
+  <style>
+    /* Styl pro rolovací seznam (jednoduchý) */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      padding: 12px 16px;
+      z-index: 1;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="{% url 'reports:index' %}">Domů</a> |
+      
+      <div class="dropdown">
+        <span>Zprávy</span>
+        <div class="dropdown-content">
+          <a href="{% url 'reports:published_report_list' %}">Publikované</a><br>
+          <a href="{% url 'reports:open_report_list' %}">Rozpracované</a>
+        </div>
+      </div> |
+
+      {% if user.is_authenticated %}
+        <a href="{% url 'profiles:profile' user.username %}">Profil</a> |
+        Přihlášen jako {{ user.username }}
+        <form method="post" action="{% url 'reports:index' %}">
+          {% csrf_token %}
+          <button type="submit" name="logout">Odhlásit se</button>
+        </form>
+        <a href="{% url 'password_change' %}">Změnit heslo</a>
+      {% else %}
+        <a href="{% url 'login' %}">Přihlásit se</a> |
+        <a href="{% url 'profiles:register' %}">Registrovat se</a>
+      {% endif %}
+    </nav>
+    <hr>
+  </header>
+
+  <main>
+    {% block content %}
+      {# Sem se vloží obsah jednotlivých stránek #}
+    {% endblock %}
+  </main>
+
+  <footer>
+    <p>© 2025 Redakční Systém NMS</p>
+  </footer>
+
+</body>
+</html>
