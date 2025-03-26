@@ -8,7 +8,10 @@
   <p>Autor: {{ object.author.username }}</p>
   <p>Rok: {{ object.year }}</p>
 
-  {% if user.is_authenticated and user == object.author or user.profile.is_admin or user.profile.is_editor %}
+  {# Pro kontrolu - zkontroluj, zda se report načítá #}
+  <p>Report ID: {{ object.pk }}</p>
+
+  {% if user.is_authenticated %}
     <a href="{% url 'reports:report_edit' object.pk %}">Editovat report</a>
   {% endif %}
 
@@ -26,24 +29,26 @@
     {% endfor %}
   {% endfor %}
 
-  {% if user.is_authenticated and (user == object.author or user.profile.is_editor or user.profile.is_admin) %}
+  {% if user.is_authenticated  %}
     <h2>Přidat odstavec</h2>
     <form method="post">
-        {% csrf_token %}
-        {{ paragraph_form.as_p }}
-        <button type="submit" name="add_paragraph">Uložit</button>
+      {% csrf_token %}
+      {{ paragraph_form.as_p }}
+      <button type="submit" name="add_paragraph">Uložit</button>
     </form>
-    
+
+    <h2>Přidat graf</h2>
     <form method="post">
-        {% csrf_token %}
-        {{ chart_form.as_p }}
-        <button type="submit" name="add_chart">Uložit</button>
+      {% csrf_token %}
+      {{ chart_form.as_p }}
+      <button type="submit" name="add_chart">Uložit</button>
     </form>
-    
+
+    <h2>Přidat tabulku</h2>
     <form method="post">
-        {% csrf_token %}
-        {{ table_form.as_p }}
-        <button type="submit" name="add_table">Uložit</button>
+      {% csrf_token %}
+      {{ table_form.as_p }}
+      <button type="submit" name="add_table">Uložit</button>
     </form>
   {% endif %}
 {% endblock %}
