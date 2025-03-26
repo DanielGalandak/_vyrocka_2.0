@@ -23,3 +23,8 @@ local_settings.py
 # Systémové soubory
 .DS_Store
 Thumbs.db
+
+# IDX
+.idx/
+dev.nix
+
