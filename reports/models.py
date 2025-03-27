@@ -55,6 +55,9 @@ class ContentElement(PolymorphicModel):
     class Meta:
         ordering = ["order"]
 
+    def get_class_name(self):  #  Přidána metoda
+        return self.__class__.__name__ # Název třídy
+
 # ----------------- Konkrétní typy obsahu -----------------
 
 class Paragraph(ContentElement):

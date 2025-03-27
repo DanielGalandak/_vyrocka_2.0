@@ -36,7 +36,7 @@ def index(request):
         form = AuthenticationForm()
 
     # Načtení nejnovějších publikovaných reportů (např. posledních 5)
-    latest_reports = Report.objects.filter(status=Report.ReportStatus.PUBLISHED).order_by('-year')[:5]
+    latest_reports = Report.objects.filter(status=Report.ReportStatus.OPEN).order_by('-year')[:5]
 
     context = {
         'form': form,
