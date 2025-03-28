@@ -25,6 +25,7 @@
 
         {% if element.get_class_name == 'Paragraph' %}
             <p>Text: {{ element.text }}</p>
+            <a href="{% url 'reports:paragraph_edit' element.pk %}">Editovat odstavec</a>  {# Odkaz na editaci #}
         {% elif element.get_class_name == 'Chart' %}
             <p>Graf: {{ element.title }} (zatím bez obsahu)</p>
         {% elif element.get_class_name == 'Table' %}

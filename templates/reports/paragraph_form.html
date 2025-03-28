@@ -1,14 +1,14 @@
 {# reports/paragraph_form.html #}
 {% extends 'base.html' %}
 
-{% block title %}Editace reportu{% endblock %}
+{% block title %}Editace odstavce{% endblock %}
 
 {% block content %}
-  <h1>Editace reportu</h1>
+  <h1>Editace odstavce</h1>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Uložit</button>
   </form>
-  <a href="{% url 'reports:report_detail' object.pk %}">Zpět na detail reportu</a>
+  <a href="{% url 'reports:report_detail' object.section.report.pk %}">Zpět na detail reportu</a>  {# Zpět na detail reportu #}
 {% endblock %}

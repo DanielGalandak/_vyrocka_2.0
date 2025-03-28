@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.views.generic import ListView, DetailView, UpdateView
 from .services import add_paragraph, add_chart, add_table
 from django.contrib import messages
+from .models import Paragraph
 from .forms import ParagraphForm, ChartForm, TableForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.urls import reverse_lazy
@@ -87,3 +88,14 @@ class ReportEditView(UpdateView):
         # Omezí přístup pouze na autory reportu (a adminy, pokud je to potřeba)
         queryset = super().get_queryset()
         return queryset.filter(author=self.request.user)
+
+@method_decorator(login_required, name='dispatch')
+class ParagraphUpdateView(UpdateView):
+    model = Paragraph
+    form_class = ParagraphForm  #  Používáš ParagraphForm
+    template_name = 'reports/paragraph_form.html'
+    #  Potřebuješ definovat success_url.  Bude to report_detail
+    #  s ID reportu
+    #  (jak získat report_id?  -- Třeba z URL, nebo z  Paragraph)
+    def get_success_url(self):
+        return reverse_lazy('reports:report_detail', kwargs={'pk': self.object.section.report.pk}) # report.pk získáš z instance Paragraph
