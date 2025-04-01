@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Report
+from .models import Report, Section, Paragraph
 from django.core.exceptions import ValidationError
 from django.views.generic import ListView, DetailView, UpdateView
 from .services import add_paragraph, add_chart, add_table
@@ -12,6 +12,7 @@ from .forms import ParagraphForm, ChartForm, TableForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from . import repositories
 
 def index(request):
     """
@@ -62,6 +63,20 @@ class OpenReportListView(ListView):
     def get_queryset(self):
         return Report.objects.exclude(status=Report.ReportStatus.PUBLISHED)
     
+# class ReportDetailView(DetailView):
+#     model = Report
+#     template_name = 'reports/report_detail.html'
+
+#     def get_queryset(self):
+#         return Report.objects.prefetch_related('sections__content_elements')
+    
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['paragraph_form'] = ParagraphForm()
+#         context['chart_form'] = ChartForm()
+#         context['table_form'] = TableForm()
+#         return context
+
 class ReportDetailView(DetailView):
     model = Report
     template_name = 'reports/report_detail.html'
@@ -69,13 +84,26 @@ class ReportDetailView(DetailView):
     def get_queryset(self):
         return Report.objects.prefetch_related('sections__content_elements')
     
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()  # Načteme report pro použití v get_context_data
+        if 'add_paragraph' in request.POST:
+            section_id = request.POST.get('section_id') # Získáme ID sekce z POST dat
+            section = get_object_or_404(Section, pk=section_id) # Načteme sekci
+            try:
+                repositories.create_paragraph(section=section, text="Zadejte text odstavce")  # Vytvoříme nový odstavec s placeholderem
+                messages.success(request, "Odstavec byl úspěšně přidán.")
+            except Exception as e:
+                messages.error(request, f"Chyba při přidávání odstavce: {e}")
+            return redirect('reports:report_detail', pk=self.object.pk)
+        else:
+            return super().post(request, *args, **kwargs)  # Jiné POST požadavky (např. editace)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['paragraph_form'] = ParagraphForm()
         context['chart_form'] = ChartForm()
         context['table_form'] = TableForm()
         return context
-
 
 @method_decorator(login_required, name='dispatch') #  Zabezpečí, že se do view dostane pouze přihlášený uživatel
 class ReportEditView(UpdateView):

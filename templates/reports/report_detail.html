@@ -19,19 +19,26 @@
     <h2>{{ section.title }}</h2>
     <p>Počet elementů: {{ section.content_elements.count }}</p>
 
+    {# Formulář pro přidání odstavce #}
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="section_id" value="{{ section.id }}">  {# Skryté pole s ID sekce #}
+      <button type="submit" name="add_paragraph">Přidat odstavec</button>
+    </form>
+
     {% for element in section.content_elements.all %}
-    <div class="content-element" data-element-id="{{ element.id }}" data-element-type="{{ element.get_class_name }}">
+      <div class="content-element" data-element-id="{{ element.id }}" data-element-type="{{ element.get_class_name }}">
         <p>Element ID: {{ element.id }} - Typ: {{ element.get_class_name }}</p>
 
         {% if element.get_class_name == 'Paragraph' %}
-            <p>Text: {{ element.text }}</p>
-            <a href="{% url 'reports:paragraph_edit' element.pk %}">Editovat odstavec</a>  {# Odkaz na editaci #}
+          <p>Text: {{ element.text }}</p>
+          <a href="{% url 'reports:paragraph_edit' element.pk %}">Editovat odstavec</a>  {# Odkaz na editaci #}
         {% elif element.get_class_name == 'Chart' %}
-            <p>Graf: {{ element.title }} (zatím bez obsahu)</p>
+          <p>Graf: {{ element.title }} (zatím bez obsahu)</p>
         {% elif element.get_class_name == 'Table' %}
-            <p>Tabulka: {{ element.title }} (zatím bez obsahu)</p>
+          <p>Tabulka: {{ element.title }} (zatím bez obsahu)</p>
         {% endif %}
-    </div>
-{% endfor %}
-        {% endfor %}
+      </div>
+    {% endfor %}
+  {% endfor %}
 {% endblock %}

@@ -61,7 +61,7 @@ class ContentElement(PolymorphicModel):
 # ----------------- Konkrétní typy obsahu -----------------
 
 class Paragraph(ContentElement):
-    text = models.TextField()
+    text = models.TextField(blank=True, default="Zadejte text odstavce")
 
     def __str__(self):
         return f"Paragraph {self.order} in {self.section.title}"
