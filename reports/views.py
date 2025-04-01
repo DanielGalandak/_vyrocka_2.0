@@ -65,49 +65,6 @@ class OpenReportListView(ListView):
 
     def get_queryset(self):
         return Report.objects.exclude(status=Report.ReportStatus.PUBLISHED)
-    
-# class ReportDetailView(DetailView):
-#     model = Report
-#     template_name = 'reports/report_detail.html'
-
-#     def get_queryset(self):
-#         return Report.objects.prefetch_related('sections__content_elements')
-    
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['paragraph_form'] = ParagraphForm()
-#         context['chart_form'] = ChartForm()
-#         context['table_form'] = TableForm()
-#         return context
-
-# class ReportDetailView(DetailView):
-#     model = Report
-#     template_name = 'reports/report_detail.html'
-
-#     def get_queryset(self):
-#         return Report.objects.prefetch_related('sections__content_elements')
-    
-#     def post(self, request, *args, **kwargs):
-#         self.object = self.get_object()  # Načteme report pro použití v get_context_data
-#         if 'add_paragraph' in request.POST:
-#             section_id = request.POST.get('section_id') # Získáme ID sekce z POST dat
-#             section = get_object_or_404(Section, pk=section_id) # Načteme sekci
-#             try:
-#                 repositories.create_paragraph(section=section, text="Zadejte text odstavce")  # Vytvoříme nový odstavec s placeholderem
-#                 messages.success(request, "Odstavec byl úspěšně přidán.")
-#             except Exception as e:
-#                 messages.error(request, f"Chyba při přidávání odstavce: {e}")
-#             return redirect('reports:report_detail', pk=self.object.pk)
-#         else:
-#             return super().post(request, *args, **kwargs)  # Jiné POST požadavky (např. editace)
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['paragraph_form'] = ParagraphForm()
-#         context['chart_form'] = ChartForm()
-#         context['table_form'] = TableForm()
-#         return context
-
 
 class ReportDetailView(DetailView):
     model = Report
@@ -117,77 +74,59 @@ class ReportDetailView(DetailView):
         return Report.objects.prefetch_related('sections__content_elements')
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()  # Načteme report pro použití v get_context_data
-
-        if 'add_paragraph' in request.POST:
-            return self.handle_add_paragraph(request)
-        elif 'move_paragraph_up' in request.POST:
-            return self.handle_move_paragraph(request, direction='up')
-        elif 'move_paragraph_down' in request.POST:
-            return self.handle_move_paragraph(request, direction='down')
-        else:
-            return super().post(request, *args, **kwargs)  # Jiné POST požadavky (např. editace)
+        self.object = self.get_object()
+        actions = {
+            'add_paragraph': self.handle_add_paragraph,
+            'move_paragraph_up': lambda req: self.handle_move_paragraph(req, 'up'),
+            'move_paragraph_down': lambda req: self.handle_move_paragraph(req, 'down'),
+        }
+        for action, handler in actions.items():
+            if action in request.POST:
+                return handler(request)
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['paragraph_form'] = ParagraphForm()
-        context['chart_form'] = ChartForm()
-        context['table_form'] = TableForm()
+        context.update({
+            'paragraph_form': ParagraphForm(),
+            'chart_form': ChartForm(),
+            'table_form': TableForm(),
+        })
         return context
 
     def handle_add_paragraph(self, request):
-        section_id = request.POST.get('section_id')  # Získáme ID sekce z POST dat
-        section = get_object_or_404(Section, pk=section_id)  # Načteme sekci
+        section = get_object_or_404(Section, pk=request.POST.get('section_id'))
         try:
-            add_paragraph(section=section, text="Zadejte text odstavce")  # Vytvoříme nový odstavec pomocí servisní funkce
+            add_paragraph(section=section, text="Zadejte text odstavce")
             messages.success(request, "Odstavec byl úspěšně přidán.")
         except Exception as e:
             messages.error(request, f"Chyba při přidávání odstavce: {e}")
         return redirect('reports:report_detail', pk=self.object.pk)
 
     def handle_move_paragraph(self, request, direction):
-        paragraph_id = request.POST.get('paragraph_id')
-        paragraph = get_object_or_404(Paragraph, pk=paragraph_id)
-        section = paragraph.section
+        paragraph = get_object_or_404(Paragraph, pk=request.POST.get('paragraph_id'))
+        paragraphs = list(Paragraph.objects.filter(section=paragraph.section).order_by('order'))
 
-        # Získat všechny odstavce v sekci, seřazené podle 'order'
-        paragraphs = list(Paragraph.objects.filter(section=section).order_by('order'))
-
-        # Najít index přesouvaného odstavce
         try:
             index = paragraphs.index(paragraph)
-        except ValueError:
-            messages.error(request, "Odstavec nenalezen v sekci.")
+            new_index = index - 1 if direction == 'up' else index + 1
+            if not (0 <= new_index < len(paragraphs)):
+                raise IndexError
+            target_paragraph = paragraphs[new_index]
+        except (ValueError, IndexError):
+            messages.info(request, "Odstavec nelze přesunout.")
             return redirect('reports:report_detail', pk=self.object.pk)
 
-        # Určit nový index a cílový odstavec
-        if direction == 'up':
-            new_index = index - 1
-        elif direction == 'down':
-            new_index = index + 1
-        else:
-            messages.error(request, "Neplatný směr přesunu.")
-            return redirect('reports:report_detail', pk=self.object.pk)
-
-        # Kontrola mezí
-        if new_index < 0 or new_index >= len(paragraphs):
-            messages.info(request, "Odstavec nelze přesunout dál.")
-            return redirect('reports:report_detail', pk=self.object.pk)
-
-        # Prohodit 'order' hodnoty odstavců v paměti
-        target_paragraph = paragraphs[new_index]
-        current_order = paragraph.order
-        paragraph.order = target_paragraph.order
-        target_paragraph.order = current_order
+        paragraph.order, target_paragraph.order = target_paragraph.order, paragraph.order
 
         with transaction.atomic():
             paragraph.save()
             target_paragraph.save()
 
-        utils.reorder_section_content(section)
-
+        utils.reorder_section_content(paragraph.section)
         messages.success(request, "Odstavec byl úspěšně přesunut.")
         return redirect('reports:report_detail', pk=self.object.pk)
+
 
 @method_decorator(login_required, name='dispatch') #  Zabezpečí, že se do view dostane pouze přihlášený uživatel
 class ReportEditView(UpdateView):
