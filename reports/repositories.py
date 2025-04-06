@@ -32,6 +32,7 @@ delete_table(table)
 """
 
 from .models import Report, Section, Paragraph, Chart, Table
+from profiles.models import User
 from django.db import models
 
 
@@ -189,15 +190,18 @@ def get_paragraph_by_id(paragraph_id: int) -> Paragraph: ###
         raise Paragraph.DoesNotExist(f"Paragraph with id {paragraph_id} not found.")
 
 
-def create_paragraph(section: Section, text: str, order: int = None) -> Paragraph: ###
-    """
-    Vytvoří nový Paragraph v dané sekci.
-    """
+def create_paragraph(section: Section, text: str, author: User, order: int = None) -> Paragraph:
     if order is None:
-        # Automatické určení pořadí
         last_paragraph = Paragraph.objects.filter(section=section).order_by('-order').first()
         order = (last_paragraph.order + 1) if last_paragraph else 1
-    paragraph = Paragraph.objects.create(section=section, text=text, order=order, status=Paragraph.ContentElementStatus.DRAFT)
+
+    paragraph = Paragraph.objects.create(
+        section=section,
+        text=text,
+        order=order,
+        author=author,
+        status=Paragraph.ContentElementStatus.DRAFT
+    )
     return paragraph
 
 

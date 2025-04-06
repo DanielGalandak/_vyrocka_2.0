@@ -95,13 +95,15 @@ class ReportDetailView(DetailView):
         return context
 
     def handle_add_paragraph(self, request):
-        section = get_object_or_404(Section, pk=request.POST.get('section_id'))
+        section_id = request.POST.get('section_id')
+        section = get_object_or_404(Section, pk=section_id)
         try:
-            add_paragraph(section=section, text="Zadejte text odstavce")
+            paragraph = add_paragraph(section=section, text="Zadejte text odstavce", author=request.user)
             messages.success(request, "Odstavec byl úspěšně přidán.")
         except Exception as e:
             messages.error(request, f"Chyba při přidávání odstavce: {e}")
         return redirect('reports:report_detail', pk=self.object.pk)
+
 
     def handle_move_paragraph(self, request, direction):
         paragraph = get_object_or_404(Paragraph, pk=request.POST.get('paragraph_id'))

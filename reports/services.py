@@ -238,27 +238,14 @@ def move_section(section: Section, new_order: int) -> Section:
 
 # -------------------- Content Element Services --------------------
 
-def add_paragraph(section: Section, text: str) -> Paragraph:
-    """
-    Přidá nový odstavec do sekce.
-
-    Args:
-        section: Sekce, do které se přidává odstavec.
-        text: Text odstavce.
-
-    Returns:
-        Paragraph: Nově vytvořený odstavec.
-
-    Raises:
-        ValidationError: Pokud validace dat selže (např. prázdný text).
-    """
+def add_paragraph(section: Section, text: str, author: User) -> Paragraph:
     try:
-        utils.validate_paragraph_data({'text': text}) # Validace dat
+        utils.validate_paragraph_data({'text': text})
     except ValidationError as e:
-        raise e # Propagujeme ValidationError dál
+        raise e
 
-    paragraph = repositories.create_paragraph(section=section, text=text)
-    utils.reorder_section_content(section)  # Volání přímo utility funkce utils.reorder_section_content
+    paragraph = repositories.create_paragraph(section=section, text=text, author=author)
+    utils.reorder_section_content(section)
     return paragraph
 
 def add_chart(section: Section, title: str, dataset_file=None, data_source=None) -> Chart:

@@ -32,6 +32,9 @@
 
         {% if element.get_class_name == 'Paragraph' %}
           <p>Text: {{ element.text }}</p>
+          <p>Autor: {{ element.author.username }}</p>
+          <p>Vytvořeno: {{ element.created_at }}</p>
+          <p>Poslední úprava: {{ element.updated_at }}</p>
           <a href="{% url 'reports:paragraph_edit' element.pk %}">Editovat odstavec</a>
 
           {# Formulář pro přesun odstavce nahoru #}

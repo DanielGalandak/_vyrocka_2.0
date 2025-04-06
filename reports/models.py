@@ -51,6 +51,9 @@ class ContentElement(PolymorphicModel):
         choices=ContentElementStatus.choices,
         default=ContentElementStatus.DRAFT
     )
+    created_at = models.DateTimeField(auto_now_add=True)  # Datum vytvoření
+    updated_at = models.DateTimeField(auto_now=True)  # Datum poslední aktualizace
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)  # Autor prvku
 
     class Meta:
         ordering = ["order"]
