@@ -1,32 +1,14 @@
 {# templates/base.html #}
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
   <title>{% block title %}Redakční Systém{% endblock %}</title>
-  <style>
-    /* Styl pro rolovací seznam (jednoduchý) */
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #f9f9f9;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      padding: 12px 16px;
-      z-index: 1;
-    }
-
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/pico.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 </head>
 <body>
-  <header>
+<!--  <header>
     <nav>
       <a href="{% url 'reports:index' %}">Domů</a> |
       
@@ -50,6 +32,40 @@
         <a href="{% url 'login' %}">Přihlásit se</a> |
         <a href="{% url 'profiles:register' %}">Registrovat se</a>
       {% endif %}
+    </nav>
+    <hr>
+  </header> -->
+
+  <header>
+    <nav class="container">
+      <ul>
+        <li><a href="{% url 'reports:index' %}" class="contrast">Domů</a></li>
+        <li>
+          <details role="list" dir="rtl">
+            <summary aria-haspopup="listbox" role="button" class="contrast">Zprávy</summary>
+            <ul role="listbox">
+              <li><a href="{% url 'reports:published_report_list' %}" class="contrast">Publikované</a></li>
+              <li><a href="{% url 'reports:open_report_list' %}" class="contrast">Rozpracované</a></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+      <ul>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'profiles:profile' user.username %}" class="contrast">Profil</a></li>
+          <li><span>Přihlášen jako {{ user.username }}</span></li>
+          <li>
+            <form method="post" action="{% url 'reports:index' %}">
+              {% csrf_token %}
+              <button type="submit" name="logout" class="link-button">Odhlásit se</button>
+            </form>
+          </li>
+          <li><a href="{% url 'password_change' %}" class="contrast">Změnit heslo</a></li>
+        {% else %}
+          <li><a href="{% url 'login' %}" class="contrast">Přihlásit se</a></li>
+          <li><a href="{% url 'profiles:register' %}" class="contrast">Registrovat se</a></li>
+        {% endif %}
+      </ul>
     </nav>
     <hr>
   </header>
