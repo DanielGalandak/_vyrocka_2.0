@@ -28,28 +28,35 @@
 
     {% for element in section.content_elements.all %}
       <div class="content-element" data-element-id="{{ element.id }}" data-element-type="{{ element.get_class_name }}">
-        <p>Element ID: {{ element.id }} - Order: {{ element.order }} - Typ: {{ element.get_class_name }}</p>
-
-        {% if element.get_class_name == 'Paragraph' %}
+        <p>Typ: {{ element.get_class_name }} | Pořadí: {{ element.order }} | Element ID: {{ element.id }}</p>
+        <div class="content-element-body">
           <p>Text: {{ element.text }}</p>
-          <p>Autor: {{ element.author.username }}</p>
-          <p>Vytvořeno: {{ element.created_at }}</p>
-          <p>Poslední úprava: {{ element.updated_at }}</p>
-          <a href="{% url 'reports:paragraph_edit' element.pk %}">Editovat odstavec</a>
-
-          {# Formulář pro přesun odstavce nahoru #}
-          <form method="post" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="paragraph_id" value="{{ element.id }}">
-            <button type="submit" name="move_paragraph_up" {% if element.order == 1 %}disabled{% endif %}>▲</button>
-          </form>
-
-          {# Formulář pro přesun odstavce dolů #}
-          <form method="post" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="paragraph_id" value="{{ element.id }}">
-            <button type="submit" name="move_paragraph_down">▼</button>
-          </form>
+        </div>
+  
+        {% if element.get_class_name == 'Paragraph' %}
+        
+        <div class="content-element-footer">
+          <div class="element-info">
+            <p>Autor: {{ element.author.username }}</p>|
+            <p>Vytvořeno: {{ element.created_at }}</p>|
+            <p>Poslední úprava: {{ element.updated_at }}</p>
+          </div>
+        
+          <div class="element-controls">
+            <a href="{% url 'reports:paragraph_edit' element.pk %}">Editovat odstavec</a>
+            <form method="post" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="paragraph_id" value="{{ element.id }}">
+              <button type="submit" name="move_paragraph_up" class="arrow-button" {% if element.order == 1 %}disabled{% endif %}>▲</button>
+            </form>
+        
+            <form method="post" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="paragraph_id" value="{{ element.id }}">
+              <button type="submit" name="move_paragraph_down" class="arrow-button">▼</button>
+            </form>
+          </div>
+        </div>
 
         {% elif element.get_class_name == 'Chart' %}
           <p>Graf: {{ element.title }} (zatím bez obsahu)</p>

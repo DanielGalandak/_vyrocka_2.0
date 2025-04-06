@@ -1,5 +1,25 @@
 /* reports/static/css/custom.css */
 
+/* Styl pro rolovací seznam (jednoduchý) */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    position: absolute;
+    display: none;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    padding: 12px 16px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
 /* Link button bez podtržení */
 .link-button {
     background: none;
@@ -19,27 +39,17 @@
 /* Zarovnání navigace, barvy pozadí a oddělení */
 nav.container {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
     background-color: #f0f0f0;
     border-bottom: 1px solid #ddd;
-    border-radius: 10px;
 }
 
-/* Zarovnání seznamů v navbaru */
-nav ul {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-/* Společný styl pro všechny odkazy, tlačítka a texty v navbaru */
+/* Společný styl pro všechny odkazy, summary a texty v navbaru */
 nav ul li a,
 nav ul li span,
+nav details[role="list"] summary,
 .link-button {
     color: #333;
     font-size: 1rem;
@@ -54,47 +64,35 @@ nav ul li span,
 }
 
 nav ul li a:hover,
-.link-button:hover {
-    color: var(--pico-primary);
-    text-decoration: underline;
-}
-
-/* Reset a zarovnání pro <summary> v <details> (Zprávy) */
-nav details[role="list"] {
-    position: relative;
-    margin: 0;
-    padding: 0;
-}
-
-nav details[role="list"] summary {
-    all: unset;
-    display: inline-block;
-    margin: 0;
-    padding: 0.4rem 0.8rem;
-    color: #333;
-    font-size: 1rem;
-    line-height: 1.5;
-    font-family: inherit;
-    font-weight: normal;
-    text-decoration: none;
-    vertical-align: middle;
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-    box-sizing: border-box;
-    height: auto;
-}
-
 nav details[role="list"] summary:hover {
     color: var(--pico-primary);
     text-decoration: underline;
 }
 
+/* Dropdown jako běžný odkaz */
+/*nav details[role="list"] summary {
+    all: unset;
+    color: #0077cc;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+}*/
+
+/* Dropdown jako běžný odkaz */
+nav details[role="list"] summary {
+    all: unset;
+    display: inline-block;
+    color: #333;
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
 /* Dropdown obsah */
 nav details[role="list"] ul[role="listbox"] {
     position: absolute;
-    top: 100%;
-    left: 0;
     margin-top: 0.2rem;
     background-color: #fff;
     border: 1px solid #ccc;
@@ -111,6 +109,16 @@ nav details[role="list"] ul[role="listbox"] li a {
 
 nav details[role="list"] ul[role="listbox"] li a:hover {
     background-color: #f2f2f2;
+}
+
+/* Zarovnání seznamů v navbaru */
+nav ul {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 /* Styl pro ContentElement jako karty */
@@ -130,25 +138,19 @@ nav details[role="list"] ul[role="listbox"] li a:hover {
 .content-element-footer {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    gap: 1rem;
+    align-items: center;
     font-size: 0.8rem;
     color: #888;
-    margin-top: 1rem;
 }
 
 /* Styl pro informace o prvku */
 .element-info {
-    display: flex;
-    justify-content: space-evenly;
-    gap: 0.2rem;
     margin: 0;
 }
 
 /* Styl pro ovládací prvky */
 .element-controls {
     display: flex;
-    align-items: center;
     gap: 0.5rem;
 }
 

@@ -42,7 +42,7 @@
         <li><a href="{% url 'reports:index' %}" class="contrast">Domů</a></li>
         <li>
           <details role="list" dir="rtl">
-            <summary aria-haspopup="listbox" role="button" class="contrast">Zprávy</summary>
+            <summary aria-haspopup="listbox" role="button">Zprávy</summary>
             <ul role="listbox">
               <li><a href="{% url 'reports:published_report_list' %}" class="contrast">Publikované</a></li>
               <li><a href="{% url 'reports:open_report_list' %}" class="contrast">Rozpracované</a></li>
@@ -53,14 +53,15 @@
       <ul>
         {% if user.is_authenticated %}
           <li><a href="{% url 'profiles:profile' user.username %}" class="contrast">Profil</a></li>
-          <li><span>Přihlášen jako {{ user.username }}</span></li>
           <li>
-            <form method="post" action="{% url 'reports:index' %}">
+            <form method="post" action="{% url 'reports:index' %}" style="display:inline;">
               {% csrf_token %}
               <button type="submit" name="logout" class="link-button">Odhlásit se</button>
             </form>
           </li>
+          
           <li><a href="{% url 'password_change' %}" class="contrast">Změnit heslo</a></li>
+          <li><span>Přihlášen jako {{ user.username }}</span></li>
         {% else %}
           <li><a href="{% url 'login' %}" class="contrast">Přihlásit se</a></li>
           <li><a href="{% url 'profiles:register' %}" class="contrast">Registrovat se</a></li>
@@ -70,13 +71,13 @@
     <hr>
   </header>
 
-  <main>
+  <main class="container">
     {% block content %}
       {# Sem se vloží obsah jednotlivých stránek #}
     {% endblock %}
   </main>
 
-  <footer>
+  <footer class="container">
     <p>© 2025 Redakční Systém NMS</p>
   </footer>
 
