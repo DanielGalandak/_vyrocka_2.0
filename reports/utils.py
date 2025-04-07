@@ -227,8 +227,8 @@ def generate_chart_preview(chart: Chart) -> str: # Returns path to preview image
     # Uložení obrázku do souboru a vrácení cesty k souboru
 
 import matplotlib
-import matplotlib.pyplot as plt
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import io
 from django.core.files.base import ContentFile
 
