@@ -248,7 +248,7 @@ def add_paragraph(section: Section, text: str, author: User) -> Paragraph:
     utils.reorder_section_content(section)
     return paragraph
 
-def add_chart(section: Section, title: str, dataset_file=None, data_source=None) -> Chart:
+def add_chart(section: Section, title: str, dataset_file=None, data_source=None, author=None) -> Chart:
     """
     Přidá nový graf do sekce.
 
@@ -266,7 +266,7 @@ def add_chart(section: Section, title: str, dataset_file=None, data_source=None)
     except ValidationError as e:
         raise e
     chart = repositories.create_chart(
-        section=section, title=title, dataset=dataset_file, data_source=data_source #oprava dataset_file -> dataset
+        section=section, title=title, dataset=dataset_file, data_source=data_source, author=author #oprava dataset_file -> dataset
     )
     utils.reorder_section_content(section) # Volání přímo utility funkce utils.reorder_section_content
     return chart

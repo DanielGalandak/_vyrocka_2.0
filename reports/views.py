@@ -108,7 +108,7 @@ class ReportDetailView(DetailView):
                 add_paragraph(section=section, text="Zadejte text odstavce", author=request.user)
                 messages.success(request, "Odstavec byl úspěšně přidán.")
             elif element_type == 'Chart':
-                add_chart(section=section, title="Nový graf")
+                add_chart(section=section, title="Nový graf",author=request.user)
                 messages.success(request, "Graf byl úspěšně přidán.")
             # Další typy (např. Table) lze snadno přidat sem
         except Exception as e:

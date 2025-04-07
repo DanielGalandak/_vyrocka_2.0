@@ -234,7 +234,7 @@ def get_chart_by_id(chart_id: int) -> Chart: ###
         raise Chart.DoesNotExist(f"Chart with id {chart_id} not found.")
 
 
-def create_chart(section: Section, title: str, dataset=None, data_source=None, order: int = None) -> Chart: ###
+def create_chart(section: Section, title: str, dataset=None, data_source=None, order: int = None, author=None) -> Chart: ###
     """
     Vytvoří nový Chart v dané sekci.
     """
@@ -243,7 +243,7 @@ def create_chart(section: Section, title: str, dataset=None, data_source=None, o
         last_chart = Chart.objects.filter(section=section).order_by('-order').first()
         order = (last_chart.order + 1) if last_chart else 1
     chart = Chart.objects.create(
-        section=section, title=title, dataset=dataset, data_source=data_source, order=order, status=Chart.ContentElementStatus.DRAFT
+        section=section, title=title, dataset=dataset, data_source=data_source, order=order, author=author, status=Chart.ContentElementStatus.DRAFT
     )
     return chart
 

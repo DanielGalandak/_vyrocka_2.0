@@ -1,30 +1,60 @@
-# Python cache
+# Python bytecode
 __pycache__/
-*.pyc
-*.pyo
-
-# Virtual environments
-venv/
-.venv/
-env/
-.env/
+*.py[cod]
+*$py.class
 
 # SQLite databáze
 *.sqlite3
 
-# Django logs a lokální nastavení
+# Logs
 *.log
+
+# Local settings
 local_settings.py
 
-# IDE soubory
+# Environment
+.env
+.env.*
+venv/
+.venv/
+env/
+
+# Media files (uploaded by users)
+media/
+
+# Staticfiles (if collected locally)
+staticfiles/
+
+# Django specific
+*.pot
+*.pyc
+*.pyo
+*.mo
+
+# Coverage & test
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+coverage.xml
+nosetests.xml
+testdb.sqlite3
+
+# IDEs
 .vscode/
 .idea/
 
-# Systémové soubory
+# macOS
 .DS_Store
+
+# Windows
 Thumbs.db
 
-# IDX
+# nix & idx
 .idx/
 dev.nix
+result
+*.rej
+*.orig
 

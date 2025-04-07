@@ -226,7 +226,9 @@ def generate_chart_preview(chart: Chart) -> str: # Returns path to preview image
     # Implementace generování náhledu grafu (např. pomocí matplotlib nebo seaborn)
     # Uložení obrázku do souboru a vrácení cesty k souboru
 
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('Agg')
 import io
 from django.core.files.base import ContentFile
 
@@ -251,6 +253,9 @@ def render_chart_image(title, chart_type, x_data, y_data, color=None):
         ValueError: Pokud je zadaný nepodporovaný typ grafu.
     """
 
+    if len(x_data) != len(y_data):
+        raise ValueError(f"Počet prvků osy X a Y se musí shodovat (x: {len(x_data)}, y: {len(y_data)}).")
+    
     plt.figure(figsize=(6, 4))
     if chart_type == 'line':
         plt.plot(x_data, y_data, color=color or 'blue')
