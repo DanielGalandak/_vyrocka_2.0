@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Úprava grafu{% endblock %}
+{% block content %}
+  <h1>Úprava grafu: {{ form.instance.title }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Uložit</button>
+  </form>
+{% endblock %}

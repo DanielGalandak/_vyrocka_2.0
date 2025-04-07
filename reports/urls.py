@@ -12,5 +12,6 @@ urlpatterns = [
     path('<int:pk>/', views.ReportDetailView.as_view(), name='report_detail'),
     path('<int:pk>/edit/', views.ReportEditView.as_view(), name='report_edit'),
     path('paragraph/<int:pk>/edit/', views.ParagraphUpdateView.as_view(), name='paragraph_edit'),
+    path('charts/<int:pk>/edit/', views.ChartUpdateView.as_view(), name='chart_edit'),
     path('logout/', LogoutView.as_view(next_page='reports:index'), name='logout'), # Používám LogoutView správně
 ]

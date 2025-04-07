@@ -225,3 +225,45 @@ def generate_chart_preview(chart: Chart) -> str: # Returns path to preview image
     raise NotImplementedError("Chart preview generation not implemented yet. Needs charting library integration (e.g., matplotlib, seaborn).")
     # Implementace generování náhledu grafu (např. pomocí matplotlib nebo seaborn)
     # Uložení obrázku do souboru a vrácení cesty k souboru
+
+import matplotlib.pyplot as plt
+import io
+from django.core.files.base import ContentFile
+
+def render_chart_image(title, chart_type, x_data, y_data, color=None):
+    """
+        Vygeneruje graf jako PNG obrázek a vrátí ho jako Django ContentFile.
+
+    Funkce použije matplotlib pro vytvoření grafu z poskytnutých dat a uloží ho
+    do paměti jako PNG soubor vhodný pro uložení do Django FileField.
+
+    Args:
+        title (str): Titulek grafu.
+        chart_type (str): Typ grafu. Povolené hodnoty: 'line', 'bar', 'pie'.
+        x_data (list[str]): Hodnoty osy X (např. roky jako řetězce).
+        y_data (list[float]): Hodnoty osy Y (čísla).
+        color (str, optional): Barva grafu (např. hex kód nebo jméno barvy). Pokud není uvedena, použije se výchozí.
+
+    Returns:
+        ContentFile: Objekt připravený k uložení do FileField (např. Chart.dataset).
+
+    Raises:
+        ValueError: Pokud je zadaný nepodporovaný typ grafu.
+    """
+
+    plt.figure(figsize=(6, 4))
+    if chart_type == 'line':
+        plt.plot(x_data, y_data, color=color or 'blue')
+    elif chart_type == 'bar':
+        plt.bar(x_data, y_data, color=color or 'green')
+    elif chart_type == 'pie':
+        plt.pie(y_data, labels=x_data, colors=[color]*len(x_data) if color else None)
+
+    plt.title(title)
+    plt.tight_layout()
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return ContentFile(buf.read(), name=f"{title.lower().replace(' ', '_')}.png")

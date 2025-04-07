@@ -12,10 +12,19 @@ class ParagraphForm(forms.ModelForm):
         fields = ['text']
 
 class ChartForm(forms.ModelForm):
+    chart_type = forms.ChoiceField(choices=[
+        ('line', 'Spojnicový'),
+        ('bar', 'Sloupcový'),
+        ('pie', 'Koláčový')
+    ])
+    color = forms.CharField(required=False, help_text="Hex kód nebo název barvy")
+    data_x = forms.CharField(widget=forms.Textarea, help_text="Čárkou oddělené roky, např. 2010,2011,...")
+    data_y = forms.CharField(widget=forms.Textarea, help_text="Čárkou oddělené hodnoty, např. 12.5,13.0,...")
+
     class Meta:
         model = Chart
-        fields = ['title', 'dataset'] #  možná upload pro dataset
-
+        fields = ['title']
+        
 class TableForm(forms.ModelForm):
     class Meta:
         model = Table

@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.views.generic import ListView, DetailView, UpdateView
 from .services import add_paragraph, add_chart, add_table
 from django.contrib import messages
-from .models import Paragraph
+from .models import Paragraph, Chart, Table, ContentElement
 from .forms import ParagraphForm, ChartForm, TableForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.urls import reverse_lazy
@@ -76,15 +76,19 @@ class ReportDetailView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+
         actions = {
-            'add_paragraph': self.handle_add_paragraph,
-            'move_paragraph_up': lambda req: self.handle_move_paragraph(req, 'up'),
-            'move_paragraph_down': lambda req: self.handle_move_paragraph(req, 'down'),
+            'add_paragraph': lambda req: self.handle_add_element(req, 'Paragraph'),
+            'add_chart': lambda req: self.handle_add_element(req, 'Chart'),
+            'move_element_up': lambda req: self.handle_move_element(req, 'up'),
+            'move_element_down': lambda req: self.handle_move_element(req, 'down'),
         }
+
         for action, handler in actions.items():
             if action in request.POST:
                 return handler(request)
-        return super().post(request, *args, **kwargs)
+
+        return redirect('reports:report_detail', pk=self.object.pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -95,39 +99,58 @@ class ReportDetailView(DetailView):
         })
         return context
 
-    def handle_add_paragraph(self, request):
+    def handle_add_element(self, request, element_type):
         section_id = request.POST.get('section_id')
         section = get_object_or_404(Section, pk=section_id)
+
         try:
-            paragraph = add_paragraph(section=section, text="Zadejte text odstavce", author=request.user)
-            messages.success(request, "Odstavec byl úspěšně přidán.")
+            if element_type == 'Paragraph':
+                add_paragraph(section=section, text="Zadejte text odstavce", author=request.user)
+                messages.success(request, "Odstavec byl úspěšně přidán.")
+            elif element_type == 'Chart':
+                add_chart(section=section, title="Nový graf")
+                messages.success(request, "Graf byl úspěšně přidán.")
+            # Další typy (např. Table) lze snadno přidat sem
         except Exception as e:
-            messages.error(request, f"Chyba při přidávání odstavce: {e}")
+            messages.error(request, f"Chyba při přidávání prvku ({element_type}): {e}")
+
         return redirect('reports:report_detail', pk=self.object.pk)
 
+    def handle_move_element(self, request, direction):
+        element_id = request.POST.get('element_id')
+        element_base = get_object_or_404(ContentElement, pk=request.POST.get('element_id'))
 
-    def handle_move_paragraph(self, request, direction):
-        paragraph = get_object_or_404(Paragraph, pk=request.POST.get('paragraph_id'))
-        paragraphs = list(Paragraph.objects.filter(section=paragraph.section).order_by('order'))
-
-        try:
-            index = paragraphs.index(paragraph)
-            new_index = index - 1 if direction == 'up' else index + 1
-            if not (0 <= new_index < len(paragraphs)):
-                raise IndexError
-            target_paragraph = paragraphs[new_index]
-        except (ValueError, IndexError):
-            messages.info(request, "Odstavec nelze přesunout.")
+        # Rozpoznání podle reálné instance
+        if isinstance(element_base, Paragraph):
+            element = element_base
+        elif isinstance(element_base, Chart):
+            element = element_base
+        elif isinstance(element_base, Table):
+            element = element_base
+        else:
+            messages.error(request, "Neznámý typ prvku.")
             return redirect('reports:report_detail', pk=self.object.pk)
 
-        paragraph.order, target_paragraph.order = target_paragraph.order, paragraph.order
+        elements = list(ContentElement.objects.filter(section=element.section).order_by('order'))
+
+        try:
+            index = elements.index(element)
+            new_index = index - 1 if direction == 'up' else index + 1
+            if not (0 <= new_index < len(elements)):
+                raise IndexError
+            target = elements[new_index]
+        except (ValueError, IndexError):
+            messages.info(request, "Prvek nelze přesunout.")
+            return redirect('reports:report_detail', pk=self.object.pk)
+
+        element.order, target.order = target.order, element.order
 
         with transaction.atomic():
-            paragraph.save()
-            target_paragraph.save()
+            element.save()
+            target.save()
 
-        utils.reorder_section_content(paragraph.section)
-        messages.success(request, "Odstavec byl úspěšně přesunut.")
+        utils.reorder_section_content(element.section)
+        messages.success(request, "Prvek byl úspěšně přesunut.")
         return redirect('reports:report_detail', pk=self.object.pk)
 
 
@@ -153,3 +176,26 @@ class ParagraphUpdateView(UpdateView):
     #  (jak získat report_id?  -- Třeba z URL, nebo z  Paragraph)
     def get_success_url(self):
         return reverse_lazy('reports:report_detail', kwargs={'pk': self.object.section.report.pk}) # report.pk získáš z instance Paragraph
+
+@method_decorator(login_required, name='dispatch')
+class ChartUpdateView(UpdateView):
+    model = Chart
+    form_class = ChartForm
+    template_name = 'reports/chart_form.html'
+
+    def form_valid(self, form):
+        chart = form.save(commit=False)
+
+        # vykresli graf jako PNG a ulož ho
+        data_x = [x.strip() for x in form.cleaned_data['data_x'].split(',')]
+        data_y = [float(y.strip()) for y in form.cleaned_data['data_y'].split(',')]
+        color = form.cleaned_data['color']
+        chart_type = form.cleaned_data['chart_type']
+
+        from .utils import render_chart_image
+        chart.dataset = render_chart_image(chart.title, chart_type, data_x, data_y, color)
+        chart.save()
+
+        messages.success(self.request, "Graf byl úspěšně upraven.")
+        return redirect('reports:report_detail', pk=chart.section.report.pk)
+

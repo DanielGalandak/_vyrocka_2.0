@@ -1,0 +1,50 @@
+{# templates/reports/content_element.html #}
+<div class="content-element" data-element-id="{{ element.id }}" data-element-type="{{ element.get_class_name }}">
+    <p>Typ: {{ element.get_class_name }} | Pořadí: {{ element.order }} | Element ID: {{ element.id }}</p>
+  
+    <div class="content-element-body">
+      {% if element.get_class_name == 'Paragraph' %}
+        <p>Text: {{ element.text }}</p>
+  
+      {% elif element.get_class_name == 'Chart' %}
+        <p>Graf: {{ element.title }}</p>
+        {% if element.dataset %}
+          <img src="{{ element.dataset.url }}" alt="Graf: {{ element.title }}">
+        {% else %}
+          <p>(Zatím nevyplněno)</p>
+        {% endif %}
+  
+      {% elif element.get_class_name == 'Table' %}
+        <p>Tabulka: {{ element.title }} (zatím bez zobrazení)</p>
+  
+      {% endif %}
+    </div>
+  
+    <div class="content-element-footer">
+      <div class="element-info">
+        <p>Autor: {{ element.author.username }}</p> |
+        <p>Vytvořeno: {{ element.created_at }}</p> |
+        <p>Poslední úprava: {{ element.updated_at }}</p>
+      </div>
+  
+      <div class="element-controls">
+        {% if element.get_class_name == 'Paragraph' %}
+          <a href="{% url 'reports:paragraph_edit' element.pk %}">Editovat odstavec</a>
+        {% elif element.get_class_name == 'Chart' %}
+          <a href="{% url 'reports:chart_edit' element.pk %}">Editovat graf</a>
+        {% endif %}
+  
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="element_id" value="{{ element.id }}">
+          <button type="submit" name="move_element_up" class="arrow-button" {% if element.order == 1 %}disabled{% endif %}>▲</button>
+        </form>
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="element_id" value="{{ element.id }}">
+          <button type="submit" name="move_element_down" class="arrow-button">▼</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
