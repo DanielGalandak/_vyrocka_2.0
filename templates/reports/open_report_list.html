@@ -1,1 +1,16 @@
+{# reports/open_report_list.html #}
+{% extends 'base.html' %}
+
+{% block title %}Seznam rozpracovaných reportů{% endblock %}
+
+{% block content %}
 <h1>Seznam rozpracovaných reportů</h1>
+<ul>
+    {% for report in reports %}
+        <li><a href="{% url 'reports:report_detail' report.id %}">{{ report.title }}</a></li>
+    {% empty %}
+        <li>Žádné reporty nebyly nalezeny.</li>
+    {% endfor %}
+
+  </ul>
+{% endblock %}

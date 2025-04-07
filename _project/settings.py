@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'data_sources',
     'profiles.apps.ProfilesConfig',
     'polymorphic',
+    'crispy_forms',
+    'crispy_bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +127,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = ['bootstrap4']
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'

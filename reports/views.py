@@ -66,6 +66,7 @@ class OpenReportListView(ListView):
     def get_queryset(self):
         return Report.objects.exclude(status=Report.ReportStatus.PUBLISHED)
 
+@method_decorator(login_required, name='dispatch')
 class ReportDetailView(DetailView):
     model = Report
     template_name = 'reports/report_detail.html'

@@ -1,26 +1,38 @@
 {% load static %}
+{% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
     <title>Registrace uživatele</title>
+    <link rel="stylesheet" href="{% static 'css/pico.min.css' %}">
 </head>
 <body>
-    <h2>Registrace uživatele</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Registrovat se</button>
-    </form>
+<main class="container">
+    <section style="max-width: 500px; margin: 0 auto;">
+        <h2>Registrace uživatele</h2>
 
-    {% if messages %}
-        <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset>
+                {{ form|crispy }}
+            </fieldset>
+            <button type="submit">Registrovat se</button>
+        </form>
 
-    <p>Máte již účet? <a href="{% url 'login' %}">Přihlaste se zde.</a></p>
+        {% if messages %}
+            <ul role="alert">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        <p>
+            Máte již účet?
+            <a href="{% url 'login' %}">Přihlaste se zde.</a>
+        </p>
+    </section>
+</main>
 </body>
 </html>

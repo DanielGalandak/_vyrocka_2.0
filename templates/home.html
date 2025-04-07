@@ -5,12 +5,14 @@
   <h1>Vítejte v Redakčním Systému</h1>
 
   {% if not user.is_authenticated %}
+  <section style="max-width: 500px;">
     <h2>Přihlášení</h2>
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit">Přihlásit se</button>
     </form>
+  </section>
   {% endif %}
 
   <h2>Nejnovější reporty</h2>
