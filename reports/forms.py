@@ -10,6 +10,13 @@ class ParagraphForm(forms.ModelForm):
     class Meta:
         model = Paragraph
         fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'id': 'editor',  # musí odpovídat v JS
+                'placeholder': 'Zadejte text odstavce…'
+            }),
+        }
+
 
 class ChartForm(forms.ModelForm):
     chart_type = forms.ChoiceField(choices=[
@@ -30,9 +37,5 @@ class TableForm(forms.ModelForm):
         model = Table
         fields = ['title', 'data'] # Uložit data jako JSON
 # zde bude formulář na založení sekce
-
-# zde bude formulář na odstavec
-
-# zde bude formulář na graf
 
 # zde bude formulář na tabulku
