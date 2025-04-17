@@ -4,6 +4,50 @@
 {% block title %}Editace odstavce{% endblock %}
 
 {% block content %}
+<main>
+  <h1>Editace odstavce</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <article class="contrast">
+        {{ form.non_field_errors }}
+      </article>
+    {% endif %}
+
+    <label for="{{ form.text.id_for_label }}">
+      Text odstavce
+      {{ form.text.errors }}
+      {{ form.text }}
+    </label>
+
+    <button type="submit">💾 Uložit</button>
+  </form>
+
+  <footer style="margin-top: 2rem;">
+    <a href="{% url 'reports:report_detail' object.section.report.pk %}">⬅ Zpět na detail reportu</a>
+  </footer>
+</main>
+
+<!-- CKEditor 5 z CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+  ClassicEditor
+    .create(document.querySelector('#editor'), {
+      toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ]
+    })
+    .catch(error => {
+        console.error(error);
+    });
+</script>
+{% endblock %}
+
+
+{% comment "old version of form" %}
+{% extends 'base.html' %}
+{% block title %}Editace odstavce{% endblock %}
+
+{% block content %}
   <h1>Editace odstavce</h1>
   <form method="post">
     {% csrf_token %}
@@ -12,3 +56,6 @@
   </form>
   <a href="{% url 'reports:report_detail' object.section.report.pk %}">Zpět na detail reportu</a>  {# Zpět na detail reportu #}
 {% endblock %}
+{% endcomment %}
+
+{# reports/paragraph_form.html #}

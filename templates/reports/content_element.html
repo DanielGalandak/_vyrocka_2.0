@@ -4,7 +4,9 @@
   
     <div class="content-element-body">
       {% if element.get_class_name == 'Paragraph' %}
-        <p>Text: {{ element.text }}</p>
+        <div class="paragraph-content">
+          {{ element.text|safe }}
+        </div>
   
       {% elif element.get_class_name == 'Chart' %}
         <p>Graf: {{ element.title }}</p>
